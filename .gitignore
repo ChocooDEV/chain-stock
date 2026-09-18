@@ -1,0 +1,25 @@
+# Secrets / local config
+.neon
+.env*.local
+
+# Dependencies
+node_modules/
+anchor/node_modules/
+
+# Build output
+.next/
+next-env.d.ts
+*.tsbuildinfo
+anchor/target/
+anchor/.anchor/
+anchor/test-ledger/
+
+# OS junk
+.DS_Store
+Thumbs.db
+
+# Agent tooling — not product code, kept local rather than shipped
+# in the repo (skill reference docs / driver scripts / internal tracker).
+.agents/
+.claude/
+TODO.md

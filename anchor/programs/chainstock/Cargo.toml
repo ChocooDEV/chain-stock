@@ -1,0 +1,29 @@
+[package]
+name = "chainstock"
+version = "0.1.0"
+description = "ChainStock escrow/claim program — see docs/Architecture.md"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "lib"]
+name = "chainstock"
+
+[features]
+no-entrypoint = []
+cpi = ["no-entrypoint"]
+default = []
+
+[dependencies]
+# Keep every anchor-* crate pinned to the exact same version (1.1.2
+# tightened inter-crate pins — see references/programs/anchor.md).
+anchor-lang = "=1.1.2"
+anchor-spl = "=1.1.2"
+
+[dev-dependencies]
+litesvm = "0.14"
+solana-sdk = "3"
+spl-token = "8"
+spl-associated-token-account = "7"
+
+[profile.release]
+overflow-checks = true

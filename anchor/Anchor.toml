@@ -1,0 +1,26 @@
+[toolchain]
+anchor_version = "1.1.2"
+
+[features]
+resolution = true
+skip-lint = false
+
+[programs.localnet]
+chainstock = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+
+[programs.mainnet]
+# Same address must be used here once deployed — Anchor keeps one program
+# keypair per program across clusters by convention. Regenerate the
+# placeholder above via `anchor keys list` after the first `anchor build`
+# (see programs/chainstock/src/lib.rs's declare_id! comment).
+chainstock = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+
+[registry]
+url = "https://api.apr.dev"
+
+[provider]
+cluster = "localnet"
+wallet = "~/.config/solana/id.json"
+
+[scripts]
+test = "echo 'Anchor 1.0+ default: anchor test spawns a Surfpool surfnet automatically. See ../docs/Architecture.md and tests/ in this workspace.'"

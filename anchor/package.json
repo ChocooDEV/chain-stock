@@ -1,0 +1,13 @@
+{
+  "name": "chainstock-anchor-tests",
+  "private": true,
+  "description": "TS integration-test tooling for the ChainStock Anchor program (see tests/integration/). Separate from the root Next.js app's package.json.",
+  "scripts": {
+    "test:integration": "vitest run --config tests/vitest.config.surfpool.ts"
+  },
+  "devDependencies": {
+    "@solana/kit": "^7.0.0",
+    "@solana/surfpool": "^1.5.0",
+    "vitest": "^2.0.0"
+  }
+}

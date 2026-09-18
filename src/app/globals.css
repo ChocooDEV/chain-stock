@@ -1,0 +1,296 @@
+@import "tailwindcss";
+
+/*
+ * Design tokens — single source of truth for the palette and type roles.
+ * See docs/Design.md and docs/Fonts.md. Keep component code free of raw
+ * hex values and font-family strings; use these utilities instead.
+ */
+@theme {
+  /* Core palette */
+  --color-ink: #211b1d;
+  --color-cloud: #fbf4ec;
+  --color-coral: #ff5a4e;
+  --color-gold: #f4b740;
+  --color-teal: #00a896;
+
+  /* Semantic — standard financial meaning, not brand decoration */
+  --color-gain: #1e9e6b;
+  --color-loss: #e1483e;
+
+  /* Type roles (see Fonts.md for why each face is used where) */
+  --font-display: var(--font-fredoka), ui-rounded, sans-serif;
+  --font-body: var(--font-inter), ui-sans-serif, sans-serif;
+  --font-ticker: var(--font-space-mono), ui-monospace, monospace;
+
+  /* Animations. The spark ones play once on mount and hold their end state
+     (`forwards`, no `infinite`) — they're an entrance, not a constant
+     motion cue. ticker-flash and shake are also single-play by nature
+     (retriggered by a remount key / a pseudo-class respectively). Only the
+     ticker's *color* flips keep looping — that's driven by TickerStrip's
+     own interval, not a CSS animation. */
+  /* fill-mode "both": holds the 0% state during animation-delay (so a
+     staggered dash isn't briefly visible before its turn), then holds the
+     100% state once it's done. */
+  --animate-spark-twinkle: spark-twinkle 0.6s ease-out both;
+  --animate-spark-pop: spark-pop 0.6s ease-out both;
+  --animate-ticker-flash: ticker-flash 0.5s ease-out;
+  --animate-shake: shake 0.5s ease-in-out;
+  --animate-toast-in: toast-in 0.25s ease-out both;
+  /* This one DOES loop — Rally staying visibly "asleep" is the point,
+     for as long as the page it's on is actually loading. */
+  --animate-loader-breathe: loader-breathe 2.4s ease-in-out infinite;
+
+  /* Claim/unwrap moment only (see docs/Design.md's "one big motion
+     moment" principle — this sequence is the one place in the product
+     that gets this much choreography). "both" fill-mode on the one-shot
+     ones for the same staggered-delay reason as the spark animations
+     above. card-pop and mascot-pop share the same back-out overshoot
+     curve so the card and Rally read as part of one physical "pop," just
+     offset in time via each element's own animation-delay. */
+  --animate-flash-pulse: flash-pulse 0.5s ease-out both;
+  --animate-confetti-fly: confetti-fly 0.8s ease-out both;
+  --animate-card-pop: card-pop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-mascot-pop: mascot-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  --animate-shine-sweep: shine-sweep 0.9s ease-in-out both;
+  /* Ambient backdrop energy for the whole sequence, not a one-shot beat —
+     the only "infinite" animation here, same reasoning as loader-breathe. */
+  --animate-ray-spin: ray-spin 9s linear infinite;
+}
+
+/* Sparks around Rally's hand (SparkCluster variant="wrap") — a gentle
+   fade/scale entrance. Staggered per-dash via animation-delay (WRAP_ANGLES
+   is listed top-to-bottom) so they appear one by one, then stay put. */
+@keyframes spark-twinkle {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Sparks around the CTA (SparkCluster variant="fan") — same idea as
+   spark-twinkle but with a bouncy overshoot so each dash reads as
+   "popping" in rather than fading in. */
+@keyframes spark-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.3);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.25);
+  }
+  80% {
+    transform: scale(0.92);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* TickerStrip — played once (via a remount key) whenever a symbol's
+   direction flips, so the update reads as a small "blip" rather than an
+   instant color swap. */
+@keyframes ticker-flash {
+  0% {
+    opacity: 0.35;
+    transform: scale(1.18) translateY(-2px);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Feature grid icons — a quick wiggle on hover/press. */
+@keyframes shake {
+  0%,
+  100% {
+    transform: rotate(0deg);
+  }
+  20% {
+    transform: rotate(-8deg);
+  }
+  40% {
+    transform: rotate(7deg);
+  }
+  60% {
+    transform: rotate(-5deg);
+  }
+  80% {
+    transform: rotate(3deg);
+  }
+}
+
+/* Toast entrance — slides up/fades in once, no loop. */
+@keyframes toast-in {
+  0% {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loader — a slow, gentle "breathing" scale/lift so Rally's resting pose
+   reads as alive-and-waiting rather than a static placeholder image. */
+@keyframes loader-breathe {
+  0%,
+  100% {
+    transform: scale(1) translateY(0);
+  }
+  50% {
+    transform: scale(1.04) translateY(-4px);
+  }
+}
+
+/* Claim/unwrap sequence (ClaimUnwrap component) below. */
+
+/* The initial "impact" beat — a bright ring expanding out from center and
+   fading, like a camera flash, timed to land right as the confetti and
+   card start moving. */
+@keyframes flash-pulse {
+  0% {
+    transform: scale(0.2);
+    opacity: 0.9;
+  }
+  100% {
+    transform: scale(3.4);
+    opacity: 0;
+  }
+}
+
+/* Each particle supplies its own --confetti-tx/--confetti-ty/--confetti-rot
+   via inline style (randomized per-particle at mount) — this one keyframe
+   just interpolates whatever destination each particle was given, the same
+   split SparkBurst uses between a shared animation and a per-dash
+   animation-delay. */
+@keyframes confetti-fly {
+  0% {
+    transform: translate(0, 0) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translate(var(--confetti-tx), var(--confetti-ty))
+      rotate(var(--confetti-rot));
+    opacity: 0;
+  }
+}
+
+/* The prize card's entrance — overshoots past full size then settles,
+   rather than easing straight to 1, so it reads as landing with real
+   weight (the same beat a physical card makes hitting a table). */
+@keyframes card-pop {
+  0% {
+    transform: scale(0.3) rotate(-6deg);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.08) rotate(2deg);
+    opacity: 1;
+  }
+  80% {
+    transform: scale(0.97) rotate(-1deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+    opacity: 1;
+  }
+}
+
+/* Rally's entrance, staggered slightly after the card via animation-delay
+   so he reads as reacting to it rather than arriving at the same instant. */
+@keyframes mascot-pop {
+  0% {
+    transform: scale(0.4) translateY(40px);
+    opacity: 0;
+  }
+  60% {
+    transform: scale(1.05) translateY(-6px);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+/* A single diagonal light band sweeping across the prize card once it's
+   landed — the "foil card" shine sold by trading-card-game reveals. */
+@keyframes shine-sweep {
+  0% {
+    transform: translateX(-120%) skewX(-20deg);
+    opacity: 0;
+  }
+  15% {
+    opacity: 0.55;
+  }
+  50% {
+    opacity: 0.55;
+  }
+  100% {
+    transform: translateX(220%) skewX(-20deg);
+    opacity: 0;
+  }
+}
+
+/* Slow continuous rotation for the conic-gradient light rays behind the
+   card — ambient energy for the sequence's whole (brief) lifetime. */
+@keyframes ray-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  background: var(--color-cloud);
+  color: var(--color-ink);
+  font-family: var(--font-body);
+  /* Inter's tabular figures, applied globally — keeps dollar amounts and
+     share counts vertically aligned wherever they appear (the history
+     tables, gift cards) per Design.md's "numbers are sacred" principle.
+     Safe at this scope: Fredoka/Space Mono elements set their own
+     font-family anyway, so this never affects non-numeric display text. */
+  font-variant-numeric: tabular-nums;
+}
+
+/* Slim, brand-colored scrollbar for scrollable lists (e.g. the gift
+   page's stock picker) instead of the default OS scrollbar — hiding it
+   entirely isn't right for a list that only shows a handful of its
+   entries at once, since that also hides the "there's more" affordance. */
+.styled-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgb(33 27 29 / 20%) transparent;
+}
+
+.styled-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.styled-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  background-color: rgb(33 27 29 / 20%);
+  border-radius: 9999px;
+}
+
+.styled-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: rgb(33 27 29 / 35%);
+}
