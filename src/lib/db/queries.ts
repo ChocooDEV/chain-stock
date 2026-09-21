@@ -1,5 +1,5 @@
 import { cache } from "react";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, gte } from "drizzle-orm";
 import { db } from "@/lib/db/client";
 import { claimAttempts, gifts, tokenLiquidity, type GiftRow } from "@/lib/db/schema";
 
@@ -54,6 +54,30 @@ export async function recordCaptchaVerification(input: {
     ipHash: input.ipHash,
     captchaVerified: true,
   });
+}
+
+/** `prepare-claim`'s FCFS gate (see that route and App.md's FCFS anti-bot
+ *  section) — true only if a Turnstile pass for this gift was recorded
+ *  within the window, not "ever." A 15-minute default matches the claim
+ *  page's own UX (the captcha overlay blocks the Claim button until
+ *  verified, then the claim itself follows within the same visit). */
+export async function hasRecentVerifiedCaptcha(
+  claimSeed: string,
+  withinMs = 15 * 60_000,
+): Promise<boolean> {
+  const cutoff = new Date(Date.now() - withinMs);
+  const rows = await db
+    .select({ id: claimAttempts.id })
+    .from(claimAttempts)
+    .where(
+      and(
+        eq(claimAttempts.claimSeed, claimSeed),
+        eq(claimAttempts.captchaVerified, true),
+        gte(claimAttempts.attemptedAt, cutoff),
+      ),
+    )
+    .limit(1);
+  return rows.length > 0;
 }
 
 /** Mints `GET /api/stocks` should drop from the catalog — see

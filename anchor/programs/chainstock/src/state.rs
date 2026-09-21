@@ -19,6 +19,15 @@ pub struct Config {
     /// the program has no other way to recognize "the trusted backend"
     /// on-chain; docs/Architecture.md should be updated to match.
     pub backend_authority: Pubkey,
+    /// The only mint `create_gift` will accept as the escrow currency.
+    /// Without this, the program was mint-agnostic — anyone could escrow
+    /// an arbitrary (fake, or Token-2022-with-a-permanent-delegate) token
+    /// while it still looked like an ordinary gift in the app. See
+    /// docs/SecurityAudit.md finding #3. Admin-settable (like `treasury`)
+    /// rather than hardcoded, since the address differs per cluster
+    /// (devnet test mints vs. mainnet's real USDC) and this same pattern
+    /// already exists for every other operational parameter here.
+    pub usdc_mint: Pubkey,
     /// Basis points, e.g. 250 = 2.5%. Hard-capped at `MAX_FEE_BPS` inside
     /// `update_config` and `initialize_config` — even a compromised admin
     /// key can't set an arbitrary fee.

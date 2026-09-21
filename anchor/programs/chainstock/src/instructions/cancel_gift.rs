@@ -51,18 +51,24 @@ pub fn handler(ctx: Context<CancelGift>) -> Result<()> {
         ChainStockError::GiftNotPending
     );
 
-    let amount = ctx.accounts.gift.amount_usdc;
     let claim_seed = ctx.accounts.gift.claim_seed;
     let bump = ctx.accounts.gift.bump;
     let decimals = ctx.accounts.usdc_mint.decimals;
     let signer_seeds: &[&[u8]] = &[GIFT_SEED, claim_seed.as_ref(), &[bump]];
     let signer_seeds_arr = &[signer_seeds];
 
-    let token_program = ctx.accounts.token_program.to_account_info();
+    let token_program = ctx.accounts.token_program.key();
+
+    // See claim_gift.rs's handler for why this is the vault's actual live
+    // balance rather than `gift.amount_usdc` — the same donation-griefing
+    // vector (anyone sending extra tokens to the vault's public ATA to
+    // permanently break `close_account`'s zero-balance requirement)
+    // applies equally to cancel's refund path.
+    let amount = ctx.accounts.vault.amount;
 
     transfer_checked(
         CpiContext::new_with_signer(
-            token_program.clone(),
+            token_program,
             TransferChecked {
                 from: ctx.accounts.vault.to_account_info(),
                 mint: ctx.accounts.usdc_mint.to_account_info(),

@@ -8,10 +8,7 @@ pub mod state;
 use instructions::*;
 use state::RecipientMode;
 
-// Placeholder — regenerate via `anchor keys list` after the first
-// `anchor build` (see Anchor.toml's [programs.*] tables, which must be
-// updated to match) and before any real deploy.
-declare_id!("Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS");
+declare_id!("3ubCASxd8ci746bJRNkdLZQvAzyS8kngFQ6smE3XohV5");
 
 /// ChainStock's escrow/claim program — see docs/Architecture.md for the
 /// full design rationale. Source of truth for money is always on-chain,
@@ -28,6 +25,7 @@ pub mod chainstock {
         ctx: Context<InitializeConfig>,
         treasury: Pubkey,
         backend_authority: Pubkey,
+        usdc_mint: Pubkey,
         fee_bps: u16,
         fee_min_usdc: u64,
     ) -> Result<()> {
@@ -35,6 +33,7 @@ pub mod chainstock {
             ctx,
             treasury,
             backend_authority,
+            usdc_mint,
             fee_bps,
             fee_min_usdc,
         )
@@ -46,6 +45,7 @@ pub mod chainstock {
         fee_min_usdc: Option<u64>,
         treasury: Option<Pubkey>,
         backend_authority: Option<Pubkey>,
+        usdc_mint: Option<Pubkey>,
     ) -> Result<()> {
         instructions::update_config::handler(
             ctx,
@@ -53,7 +53,12 @@ pub mod chainstock {
             fee_min_usdc,
             treasury,
             backend_authority,
+            usdc_mint,
         )
+    }
+
+    pub fn close_config(ctx: Context<CloseConfig>) -> Result<()> {
+        instructions::close_config::handler(ctx)
     }
 
     pub fn create_gift(

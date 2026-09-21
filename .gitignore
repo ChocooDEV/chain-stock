@@ -1,6 +1,7 @@
 # Secrets / local config
 .neon
 .env*.local
+docs/Wallets.md
 
 # Dependencies
 node_modules/

@@ -4,6 +4,8 @@ import Image from "next/image";
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { usePrivy } from "@privy-io/react-auth";
+import { useWallets as useSolanaWallets, useSignAndSendTransaction } from "@privy-io/react-auth/solana";
+import bs58 from "bs58";
 import { Loader } from "@/components/Loader";
 import { Container } from "@/components/ui/Container";
 import { Button } from "@/components/ui/Button";
@@ -18,13 +20,16 @@ import type { ClaimGift } from "@/lib/gift";
 import { formatShares } from "@/lib/shares";
 import { toTickerItem } from "@/lib/stocks";
 import { TURNSTILE_ACTION_CLAIM_FCFS } from "@/lib/turnstile";
+import { getCluster } from "@/lib/solana/env";
 import rallyCelebrating from "../../../../public/mascot/rally-celebrating.png";
 
 /**
- * Claim screen (docs/mockup/claim.png) — UI only for now, same phase as
- * the create-gift page: authentication is real (Privy), the claim
- * transaction itself isn't wired yet (claiming just navigates straight
- * to the post-claim page once authenticated).
+ * Claim screen (docs/mockup/claim.png). Once authenticated, calls
+ * `POST /api/gifts/[claimSeed]/prepare-claim` (builds `claim_gift`
+ * server-side — see that route's doc comment for the devnet-mode
+ * simplifications, notably no Jupiter swap yet), has the connected Privy
+ * wallet sign and send it, then confirms via `confirm-claim` before the
+ * unwrap animation plays.
  *
  * Deliberately ONE "Claim gift" button, not the mockup's three ("Connect
  * wallet" / "Sign up to claim" / "Claim gift") — docs/App.md decided
@@ -51,10 +56,13 @@ export function ClaimPageClient({
   turnstileSiteKey: string | undefined;
 }) {
   const router = useRouter();
-  const { ready, authenticated, login } = usePrivy();
+  const { ready, authenticated, login, user } = usePrivy();
+  const { wallets: privyWallets } = useSolanaWallets();
+  const { signAndSendTransaction } = useSignAndSendTransaction();
   const { stocks, loading } = useLiveStocks();
   const { toast, showToast, dismiss: dismissToast } = useToast();
   const [claiming, setClaiming] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   // FCFS-only anti-bot check (docs/App.md's FCFS section) — dedicated
   // gifts already have identity verification via wallet/email, so
@@ -98,19 +106,67 @@ export function ClaimPageClient({
     }
   };
 
-  const handleClaim = () => {
+  const handleClaim = async () => {
     if (!ready) return;
     if (needsCaptcha && captchaStatus !== "verified") return;
     if (!authenticated) {
       login();
       return;
     }
-    // Claim transaction wiring (claim_gift + swap, backend-co-signed for
-    // no-SOL Privy wallets — see docs/Architecture.md's fee-payer
-    // section) comes next; this is the point where it plugs in, before
-    // the unwrap animation below. For now the animation fires as soon as
-    // authenticated, same UI-first phase as the rest of this flow.
-    setClaiming(true);
+    const wallet = privyWallets[0];
+    if (!wallet) {
+      showToast("No wallet found on your account — try signing in again.");
+      return;
+    }
+    if (submitting) return;
+
+    setSubmitting(true);
+    try {
+      const prepareRes = await fetch(`/api/gifts/${gift.claimSeed}/prepare-claim`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          claimerWallet: wallet.address,
+          recipientEmail: user?.email?.address,
+        }),
+      });
+      if (!prepareRes.ok) {
+        const errorBody = await prepareRes.json().catch(() => null);
+        throw new Error(errorBody?.error ?? "Couldn't prepare the claim");
+      }
+      const { transaction: base64Transaction } = await prepareRes.json();
+      const transactionBytes = Uint8Array.from(atob(base64Transaction), (c) => c.charCodeAt(0));
+
+      const { signature } = await signAndSendTransaction({
+        transaction: transactionBytes,
+        wallet,
+        chain: getCluster() === "mainnet-beta" ? "solana:mainnet" : "solana:devnet",
+      });
+      const signatureBase58 = bs58.encode(signature);
+
+      const confirmRes = await fetch(`/api/gifts/${gift.claimSeed}/confirm-claim`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          claimTxSignature: signatureBase58,
+          recipientWallet: wallet.address,
+        }),
+      });
+      if (!confirmRes.ok) {
+        const errorBody = await confirmRes.json().catch(() => null);
+        throw new Error(errorBody?.error ?? "Couldn't confirm the claim");
+      }
+
+      setClaiming(true);
+    } catch (error) {
+      showToast(
+        error instanceof Error
+          ? `Couldn't claim the gift: ${error.message}`
+          : "Couldn't claim the gift — try again.",
+      );
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   if (loading) {
@@ -151,10 +207,15 @@ export function ClaimPageClient({
             <Button
               type="button"
               onClick={handleClaim}
-              disabled={!ready || claiming || (needsCaptcha && captchaStatus !== "verified")}
+              disabled={
+                !ready ||
+                claiming ||
+                submitting ||
+                (needsCaptcha && captchaStatus !== "verified")
+              }
               className="px-16 py-5 text-xl"
             >
-              Claim gift
+              {submitting ? "Claiming…" : "Claim gift"}
             </Button>
           </div>
 

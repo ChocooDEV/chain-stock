@@ -22,4 +22,6 @@ pub enum ChainStockError {
     UnauthorizedCanceler,
     #[msg("Arithmetic overflow")]
     Overflow,
+    #[msg("usdc_mint does not match config.usdc_mint")]
+    WrongUsdcMint,
 }

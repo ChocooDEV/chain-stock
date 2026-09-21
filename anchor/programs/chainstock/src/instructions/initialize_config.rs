@@ -30,6 +30,7 @@ pub fn handler(
     ctx: Context<InitializeConfig>,
     treasury: Pubkey,
     backend_authority: Pubkey,
+    usdc_mint: Pubkey,
     fee_bps: u16,
     fee_min_usdc: u64,
 ) -> Result<()> {
@@ -39,6 +40,7 @@ pub fn handler(
     config.admin = ctx.accounts.admin.key();
     config.treasury = treasury;
     config.backend_authority = backend_authority;
+    config.usdc_mint = usdc_mint;
     config.fee_bps = fee_bps;
     config.fee_min_usdc = fee_min_usdc;
     config.bump = ctx.bumps.config;

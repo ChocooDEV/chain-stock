@@ -120,18 +120,30 @@ pub fn handler(ctx: Context<ClaimGift>) -> Result<()> {
         }
     }
 
-    let amount = gift.amount_usdc;
     let claim_seed = gift.claim_seed;
     let bump = gift.bump;
     let decimals = ctx.accounts.usdc_mint.decimals;
     let signer_seeds: &[&[u8]] = &[GIFT_SEED, claim_seed.as_ref(), &[bump]];
     let signer_seeds_arr = &[signer_seeds];
 
-    let token_program = ctx.accounts.token_program.to_account_info();
+    let token_program = ctx.accounts.token_program.key();
+
+    // Transfer the vault's actual live balance, not `gift.amount_usdc` —
+    // anyone can send extra tokens directly to the vault's publicly
+    // derivable ATA before this runs (a "donation" no instruction here
+    // controls). Draining only `gift.amount_usdc` would leave that excess
+    // behind, and the `close_account` CPI below requires an exactly-zero
+    // balance to succeed — a single 1-unit donation would otherwise
+    // permanently brick both `claim_gift` and `cancel_gift` for this gift,
+    // freezing the escrow forever. Transferring the full live balance
+    // guarantees the vault is always empty afterward (any donated excess
+    // just becomes a bonus for the recipient — harmless, no protocol funds
+    // at risk) and removes the griefing vector entirely.
+    let amount = ctx.accounts.vault.amount;
 
     transfer_checked(
         CpiContext::new_with_signer(
-            token_program.clone(),
+            token_program,
             TransferChecked {
                 from: ctx.accounts.vault.to_account_info(),
                 mint: ctx.accounts.usdc_mint.to_account_info(),

@@ -24,6 +24,16 @@ pub struct CreateGift<'info> {
     )]
     pub gift: Account<'info, Gift>,
 
+    // Pinned to `config.usdc_mint` — without this, `create_gift` was
+    // mint-agnostic: anyone could escrow an arbitrary (fake, or
+    // Token-2022-with-a-permanent-delegate) token while it still looked
+    // like an ordinary gift in the app. See docs/SecurityAudit.md finding
+    // #3. `claim_gift`/`cancel_gift` don't need the same check — a gift's
+    // vault already has its real mint locked in from creation, and their
+    // own `associated_token::mint = usdc_mint` constraints already cross-
+    // check the passed-in `usdc_mint` against the vault's actual stored
+    // mint field.
+    #[account(address = config.usdc_mint @ ChainStockError::WrongUsdcMint)]
     pub usdc_mint: InterfaceAccount<'info, Mint>,
 
     #[account(
@@ -92,12 +102,12 @@ pub fn handler(
     let fee = fee_from_bps.max(config.fee_min_usdc);
 
     let decimals = ctx.accounts.usdc_mint.decimals;
-    let token_program = ctx.accounts.token_program.to_account_info();
+    let token_program = ctx.accounts.token_program.key();
 
     // 1. amount_usdc into the escrow vault.
     transfer_checked(
         CpiContext::new(
-            token_program.clone(),
+            token_program,
             TransferChecked {
                 from: ctx.accounts.sender_usdc.to_account_info(),
                 mint: ctx.accounts.usdc_mint.to_account_info(),

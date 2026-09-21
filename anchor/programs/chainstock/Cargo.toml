@@ -12,18 +12,36 @@ name = "chainstock"
 no-entrypoint = []
 cpi = ["no-entrypoint"]
 default = []
+idl-build = ["anchor-lang/idl-build", "anchor-spl/idl-build"]
 
 [dependencies]
 # Keep every anchor-* crate pinned to the exact same version (1.1.2
 # tightened inter-crate pins — see references/programs/anchor.md).
-anchor-lang = "=1.1.2"
+anchor-lang = { version = "=1.1.2", features = ["init-if-needed"] }
 anchor-spl = "=1.1.2"
 
 [dev-dependencies]
-litesvm = "0.14"
+# 0.14.0 pinned by the compatibility matrix for Anchor 1.1.x has an
+# internal version split (its own direct deps mix solana-* v3.x and v4.x
+# lines — wincode 0.5.5 direct dep vs. wincode 0.6.1 needed by its own
+# transitive solana-account v4.7.0), which fails to compile regardless of
+# our pins here. 0.13.0 resolves to a single consistent solana-* v3 line
+# matching anchor-lang's own pin — verified via a minimal probe project.
+litesvm = "=0.13.0"
 solana-sdk = "3"
-spl-token = "8"
-spl-associated-token-account = "7"
+solana-system-interface = "3"
+solana-client = "3"
+solana-commitment-config = "3"
+# `no-entrypoint` so each crate skips its on-chain `entrypoint!`
+# boilerplate (only meaningful in an SBF cdylib build, not this native
+# test binary). Their `Pubkey`/`Instruction` types still resolve through
+# an older, separate `solana-pubkey`/`solana-instruction` line than
+# `solana-sdk`'s (their own manifests pin it directly — not a version
+# choice we can unify away); the test file converts explicitly at that
+# boundary instead (see its `to_spl_pubkey`/`from_spl_pubkey`/`from_spl_ix`
+# helpers).
+spl-token = { version = "8", features = ["no-entrypoint"] }
+spl-associated-token-account = { version = "7", features = ["no-entrypoint"] }
 
 [profile.release]
 overflow-checks = true

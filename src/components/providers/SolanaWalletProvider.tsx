@@ -3,8 +3,8 @@
 import { useMemo } from "react";
 import { ConnectionProvider, WalletProvider } from "@solana/wallet-adapter-react";
 import { WalletModalProvider } from "@solana/wallet-adapter-react-ui";
-import { clusterApiUrl } from "@solana/web3.js";
 import "@solana/wallet-adapter-react-ui/styles.css";
+import { getClientRpcUrl } from "@/lib/solana/env";
 
 /**
  * Wraps the app with Solana wallet-adapter context so any page can call
@@ -23,10 +23,11 @@ export function SolanaWalletProvider({
 }: {
   children: React.ReactNode;
 }) {
-  // Public mainnet-beta RPC — fine for read-only wallet connection during
-  // UI-only work, but swap in a real RPC provider (Helius/QuickNode/etc.)
-  // before any transaction actually gets submitted.
-  const endpoint = useMemo(() => clusterApiUrl("mainnet-beta"), []);
+  // Cluster-aware (see lib/solana/env.ts) — currently devnet while the
+  // program is only deployed there (docs/Wallets.md). A connected wallet
+  // extension must itself be switched to the matching cluster, or its
+  // own signed transactions will target the wrong network.
+  const endpoint = useMemo(() => getClientRpcUrl(), []);
 
   return (
     <ConnectionProvider endpoint={endpoint}>

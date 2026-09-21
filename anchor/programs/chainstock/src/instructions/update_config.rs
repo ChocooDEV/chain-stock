@@ -9,6 +9,7 @@ use crate::state::Config;
 #[derive(Accounts)]
 pub struct UpdateConfig<'info> {
     #[account(
+        mut,
         seeds = [CONFIG_SEED],
         bump = config.bump,
         has_one = admin @ ChainStockError::Unauthorized,
@@ -24,6 +25,7 @@ pub fn handler(
     fee_min_usdc: Option<u64>,
     treasury: Option<Pubkey>,
     backend_authority: Option<Pubkey>,
+    usdc_mint: Option<Pubkey>,
 ) -> Result<()> {
     let config = &mut ctx.accounts.config;
 
@@ -39,6 +41,9 @@ pub fn handler(
     }
     if let Some(backend_authority) = backend_authority {
         config.backend_authority = backend_authority;
+    }
+    if let Some(usdc_mint) = usdc_mint {
+        config.usdc_mint = usdc_mint;
     }
 
     Ok(())
