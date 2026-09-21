@@ -16,6 +16,7 @@ import { generateClaimSeed, encodeClaimSeed } from "@/lib/solana/claimSeed";
 import { BN, getConfigPda, getGiftPda, getProgram } from "@/lib/solana/program";
 import { isValidSolanaAddress } from "@/lib/solana/address";
 import { isValidEmail, hashEmail } from "@/lib/email";
+import { useLegalGate } from "@/components/legal/LegalGateProvider";
 import { StepHeading } from "@/components/gift/StepHeading";
 import { StockPicker } from "@/components/gift/StockPicker";
 import { AmountInput } from "@/components/gift/AmountInput";
@@ -73,6 +74,7 @@ export function GiftForm({
   const { connection } = useConnection();
   const { setVisible: setWalletModalVisible } = useWalletModal();
   const { toast, showToast, dismiss: dismissToast } = useToast();
+  const { requireAcceptance } = useLegalGate();
   const [sending, setSending] = useState(false);
 
   // Default to the first live stock once the catalog loads, if the sender
@@ -97,6 +99,8 @@ export function GiftForm({
       showToast(recipientError);
       return;
     }
+    const acceptedTerms = await requireAcceptance();
+    if (!acceptedTerms) return;
     if (!connected || !publicKey || !anchorWallet) {
       setWalletModalVisible(true);
       return;

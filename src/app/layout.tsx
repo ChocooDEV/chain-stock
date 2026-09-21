@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { fontDisplay, fontBody, fontTicker } from "@/lib/fonts";
 import { SolanaWalletProvider } from "@/components/providers/SolanaWalletProvider";
 import { PrivyClientProvider } from "@/components/providers/PrivyClientProvider";
+import { LegalGateProvider } from "@/components/legal/LegalGateProvider";
 import { DevnetBanner } from "@/components/DevnetBanner";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
@@ -45,7 +46,9 @@ export default function RootLayout({
       <body>
         <DevnetBanner />
         <PrivyClientProvider appId={process.env.PRIVY_APP_ID}>
-          <SolanaWalletProvider>{children}</SolanaWalletProvider>
+          <SolanaWalletProvider>
+            <LegalGateProvider>{children}</LegalGateProvider>
+          </SolanaWalletProvider>
         </PrivyClientProvider>
       </body>
     </html>

@@ -21,6 +21,7 @@ import { formatShares } from "@/lib/shares";
 import { toTickerItem } from "@/lib/stocks";
 import { TURNSTILE_ACTION_CLAIM_FCFS } from "@/lib/turnstile";
 import { getCluster } from "@/lib/solana/env";
+import { useLegalGate } from "@/components/legal/LegalGateProvider";
 import rallyCelebrating from "../../../../public/mascot/rally-celebrating.png";
 
 /**
@@ -59,6 +60,7 @@ export function ClaimPageClient({
   const { ready, authenticated, login, user } = usePrivy();
   const { wallets: privyWallets } = useSolanaWallets();
   const { signAndSendTransaction } = useSignAndSendTransaction();
+  const { requireAcceptance } = useLegalGate();
   const { stocks, loading } = useLiveStocks();
   const { toast, showToast, dismiss: dismissToast } = useToast();
   const [claiming, setClaiming] = useState(false);
@@ -109,6 +111,8 @@ export function ClaimPageClient({
   const handleClaim = async () => {
     if (!ready) return;
     if (needsCaptcha && captchaStatus !== "verified") return;
+    const acceptedTerms = await requireAcceptance();
+    if (!acceptedTerms) return;
     if (!authenticated) {
       login();
       return;

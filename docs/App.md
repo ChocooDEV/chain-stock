@@ -106,6 +106,10 @@ Payroll/invoicing style flow: employer or DAO disburses payments split between U
 
 If the DB were wiped, worst case is losing gift messages and rebuilding the index from on-chain history — never losing funds.
 
+## Legal consent
+
+First time a visitor is about to send or claim a gift — the moment they're about to connect a wallet and move real funds, not every page visit — a popup (`LegalGateProvider`/`LegalAcceptanceModal`, `src/components/legal/`) requires them to check a box agreeing to the Terms of Service and Privacy Policy (`/terms`, `/privacy`) before the send/claim flow continues. Declining just closes the modal and cancels that attempt; nothing about the app is otherwise locked. Acceptance is localStorage-only, scoped to the browser rather than to a wallet address or account — ChainStock has no persistent user-account system to hang a server-side record off (wallet-adapter and Privy are both just signing identities), so this is the practical equivalent of the pattern rather than the full server-backed version. Bumping `LEGAL_VERSION` (`src/lib/legal/constants.ts`) forces everyone to re-accept, for whenever the terms change materially.
+
 **Pick: Neon** (serverless Postgres) instead of Supabase — the founder's Supabase free tier is already at its 2-project cap. Neon is effectively a drop-in Postgres replacement (same SQL, same ORM code, no Supabase-specific rework needed) with a generous free tier and an HTTP driver suited to serverless deploys. Not using Supabase's auth/realtime here anyway (Privy handles wallet auth), so there's no feature loss in switching.
 
 **Write pattern for the hackathon timeline:** backend writes to the DB in the same request where it builds/submits the on-chain transaction, treating each row as a cache rather than standing up a separate indexer/webhook listener. Less robust long-term (a webhook-driven indexer, e.g. via Helius, would avoid any drift between chain state and DB state) but the right tradeoff given the time available — reconciling drift later is a smaller problem than not shipping.
