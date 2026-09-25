@@ -127,7 +127,7 @@ export function HistoryPageClient() {
         throw new Error(body?.error ?? "Failed to confirm the cancellation");
       }
 
-      showToast(`Canceled — the $${row.amountUsd} gift was refunded to your wallet.`, "info");
+      showToast(`Canceled - the $${row.amountUsd} gift was refunded to your wallet.`, "info");
       // Re-fetch by forcing the addresses effect to rerun would need a
       // key bump; simplest correct fix is a full reload of this page's
       // data, which a location reload trivially achieves without adding
@@ -137,7 +137,7 @@ export function HistoryPageClient() {
       showToast(
         error instanceof Error
           ? `Couldn't cancel: ${error.message}`
-          : "Couldn't cancel the gift — try again.",
+          : "Couldn't cancel the gift - try again.",
       );
     } finally {
       setCanceling(null);
@@ -160,7 +160,7 @@ export function HistoryPageClient() {
             Connect to see your gifts
           </h1>
           <p className="mt-3 text-ink/60">
-            Your sent and claimed gifts live behind your wallet — connect
+            Your sent and claimed gifts live behind your wallet - connect
             the one you sent from, the one you claimed with, or both.
           </p>
           <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">

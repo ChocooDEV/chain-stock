@@ -109,7 +109,7 @@ export async function renderDefaultCard(): Promise<ImageResponse> {
           Send real stock, as easily as a link.
         </div>
         <div style={{ display: "flex", marginTop: 24, fontSize: 30, color: INK_60 }}>
-          Gift real, tokenized stock in seconds — no wallet required to
+          Gift real, tokenized stock in seconds - no wallet required to
           claim.
         </div>
       </CardShell>

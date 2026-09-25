@@ -83,7 +83,7 @@ export function GiftSentClient() {
     if (succeeded) {
       showToast("Link copied to clipboard.", "info");
     } else {
-      showToast("Couldn't copy automatically — copy the link manually.");
+      showToast("Couldn't copy automatically - copy the link manually.");
     }
   };
 
@@ -196,7 +196,7 @@ export function GiftSentClient() {
               </div>
 
               <p className="mt-6 text-center text-sm text-ink/60">
-                Share it however you&rsquo;d like — text, DM, however
+                Share it however you&rsquo;d like - text, DM, however
                 you&rsquo;d send anything else.
               </p>
 

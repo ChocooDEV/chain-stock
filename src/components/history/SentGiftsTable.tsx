@@ -81,7 +81,7 @@ export function SentGiftsTable({
                     Cancel
                   </button>
                 ) : (
-                  <span className="text-sm text-ink/30">—</span>
+                  <span className="text-sm text-ink/30">-</span>
                 )}
               </div>
             </div>

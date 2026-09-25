@@ -26,7 +26,7 @@ export async function generateMetadata({
   }
 
   const gift = toClaimGift(row);
-  const description = `Someone sent you $${gift.amountUsd} of ${gift.symbol} on ChainStock — real stock, no wallet required to claim.`;
+  const description = `Someone sent you $${gift.amountUsd} of ${gift.symbol} on ChainStock - real stock, no wallet required to claim.`;
 
   // `openGraph`/`twitter` here don't deep-merge with the root layout's
   // (Next.js metadata resolution replaces the whole object per segment

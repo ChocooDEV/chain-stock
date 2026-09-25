@@ -208,7 +208,7 @@ export function GiftForm({
       showToast(
         error instanceof Error
           ? `Couldn't send the gift: ${error.message}`
-          : "Couldn't send the gift — try again.",
+          : "Couldn't send the gift - try again.",
       );
     } finally {
       setSending(false);

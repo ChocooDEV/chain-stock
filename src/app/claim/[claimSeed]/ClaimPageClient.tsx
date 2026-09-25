@@ -104,7 +104,7 @@ export function ClaimPageClient({
       setCaptchaStatus("verified");
     } catch {
       setCaptchaStatus("error");
-      showToast("Couldn't verify you're human — try the check again.");
+      showToast("Couldn't verify you're human - try the check again.");
     }
   };
 
@@ -119,7 +119,7 @@ export function ClaimPageClient({
     }
     const wallet = privyWallets[0];
     if (!wallet) {
-      showToast("No wallet found on your account — try signing in again.");
+      showToast("No wallet found on your account - try signing in again.");
       return;
     }
     if (submitting) return;
@@ -166,7 +166,7 @@ export function ClaimPageClient({
       showToast(
         error instanceof Error
           ? `Couldn't claim the gift: ${error.message}`
-          : "Couldn't claim the gift — try again.",
+          : "Couldn't claim the gift - try again.",
       );
     } finally {
       setSubmitting(false);

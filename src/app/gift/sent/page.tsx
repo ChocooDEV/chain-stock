@@ -14,7 +14,7 @@ import { GiftSentClient } from "./GiftSentClient";
 // route where the connect button actually lives.
 export const metadata: Metadata = {
   title: "ChainStock",
-  description: "Your gift is on its way — share the claim link with your friend.",
+  description: "Your gift is on its way - share the claim link with your friend.",
 };
 
 export default function GiftSentPage() {

@@ -9,7 +9,7 @@ import { SuccessPageClient } from "./SuccessPageClient";
 // wallet/Privy modal could still be open on.
 export const metadata: Metadata = {
   title: "ChainStock",
-  description: "You've got stock — see what you just claimed.",
+  description: "You've got stock - see what you just claimed.",
 };
 
 export default async function ClaimSuccessPage({

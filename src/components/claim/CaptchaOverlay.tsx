@@ -75,7 +75,7 @@ export function CaptchaOverlay({
         />
         {status === "error" && (
           <p className="text-sm text-loss">
-            Verification failed — try the check again.
+            Verification failed - try the check again.
           </p>
         )}
       </div>

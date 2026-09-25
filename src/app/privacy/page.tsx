@@ -3,7 +3,7 @@ import { LegalDocumentShell } from "@/components/legal/LegalDocumentShell";
 import { PRIVACY_LAST_UPDATED } from "@/lib/legal/constants";
 
 export const metadata: Metadata = {
-  title: "Privacy Policy — ChainStock",
+  title: "Privacy Policy - ChainStock",
 };
 
 /**
@@ -17,7 +17,7 @@ export default function PrivacyPage() {
         <h2>1. Overview</h2>
         <p>
           This policy explains what ChainStock collects, why, and how it&rsquo;s
-          handled. ChainStock is a non-custodial app — we never hold your
+          handled. ChainStock is a non-custodial app - we never hold your
           funds or private keys.
         </p>
       </section>
@@ -26,25 +26,25 @@ export default function PrivacyPage() {
         <h2>2. Information we collect</h2>
         <ul>
           <li>
-            <strong>Wallet addresses</strong> — the public addresses of
+            <strong>Wallet addresses</strong> - the public addresses of
             wallets you connect (wallet-adapter for sending, Privy for
             claiming), plus whatever a Solana block explorer would already
             show about them.
           </li>
           <li>
-            <strong>Email address</strong> — only if you sign in with email
+            <strong>Email address</strong> - only if you sign in with email
             via Privy, or if a gift sender enters your email as the
             recipient (stored to match you to that gift at claim time, and
-            hashed before being recorded on-chain — your plaintext email
+            hashed before being recorded on-chain - your plaintext email
             never touches the blockchain).
           </li>
           <li>
-            <strong>Gift details</strong> — amount, stock, recipient
+            <strong>Gift details</strong> - amount, stock, recipient
             (wallet/email/open-link), status, and the on-chain transaction
             signatures for anything you send or claim.
           </li>
           <li>
-            <strong>Anti-bot signals</strong> — a hashed IP address and
+            <strong>Anti-bot signals</strong> - a hashed IP address and
             Cloudflare Turnstile result, recorded only for open-link (FCFS)
             claim attempts.
           </li>
@@ -77,7 +77,7 @@ export default function PrivacyPage() {
           Solana is a public, permanent ledger. Wallet addresses, transaction
           amounts, and gift status are publicly visible and permanently
           recorded on-chain once confirmed, whether or not you keep using
-          ChainStock. We can&rsquo;t delete or alter on-chain data — only what
+          ChainStock. We can&rsquo;t delete or alter on-chain data - only what
           lives in our own database.
         </p>
       </section>
@@ -85,9 +85,9 @@ export default function PrivacyPage() {
       <section>
         <h2>6. Cookies and local storage</h2>
         <p>
-          We use your browser&rsquo;s local storage for functional purposes —
+          We use your browser&rsquo;s local storage for functional purposes -
           e.g. remembering your in-progress gift draft, and whether
-          you&rsquo;ve accepted these Terms — not for third-party ad tracking.
+          you&rsquo;ve accepted these Terms - not for third-party ad tracking.
         </p>
       </section>
 
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
         <p>
           We take reasonable technical measures to protect the data we
           hold, but no system is perfectly secure. You&rsquo;re responsible for
-          your own wallet security — see Terms &sect;3.
+          your own wallet security - see Terms &sect;3.
         </p>
       </section>
 

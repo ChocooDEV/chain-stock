@@ -7,7 +7,7 @@ import { SparkBurst } from "@/components/SparkBurst";
 import rallyLost from "../../public/mascot/rally-404.png";
 
 export const metadata: Metadata = {
-  title: "Page not found — ChainStock",
+  title: "Page not found - ChainStock",
 };
 
 /**

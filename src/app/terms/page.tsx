@@ -3,7 +3,7 @@ import { LegalDocumentShell } from "@/components/legal/LegalDocumentShell";
 import { TERMS_LAST_UPDATED } from "@/lib/legal/constants";
 
 export const metadata: Metadata = {
-  title: "Terms of Service — ChainStock",
+  title: "Terms of Service - ChainStock",
 };
 
 /**
@@ -31,7 +31,7 @@ export default function TermsPage() {
         <p>
           You must be legally able to enter into these Terms in your
           jurisdiction, and old enough to do so under local law. Tokenized
-          stock gifting may not be available or lawful everywhere — you&rsquo;re
+          stock gifting may not be available or lawful everywhere - you&rsquo;re
           responsible for checking your own local rules before sending or
           claiming a gift.
         </p>
@@ -41,7 +41,7 @@ export default function TermsPage() {
         <h2>3. Accounts and wallets</h2>
         <p>
           Sending a gift requires connecting your own Solana wallet (e.g.
-          Phantom, Solflare, Backpack) — you hold your own keys, ChainStock
+          Phantom, Solflare, Backpack) - you hold your own keys, ChainStock
           never has custody of your funds or the ability to move them
           without your signature. Claiming a gift uses Privy, which can
           create a wallet for you automatically if you don&rsquo;t already have
@@ -57,7 +57,7 @@ export default function TermsPage() {
           Sending a gift escrows funds in an on-chain program account until
           the recipient claims it or the sender cancels it. A small platform
           fee is charged at send time. The program is the source of truth
-          for every gift&rsquo;s status — ChainStock&rsquo;s own database is only a
+          for every gift&rsquo;s status - ChainStock&rsquo;s own database is only a
           convenience index of what already happened on-chain, never the
           other way around. A claimed or expired gift cannot be un-claimed;
           a canceled gift cannot be re-sent under the same link.
@@ -105,7 +105,7 @@ export default function TermsPage() {
           authentication), Backpack Securities and Sunrise (the underlying
           tokenized-stock issuer/listings), Jupiter (token swaps), and
           Cloudflare Turnstile (anti-bot checks). Their availability,
-          accuracy, and terms are their own — ChainStock isn&rsquo;t responsible
+          accuracy, and terms are their own - ChainStock isn&rsquo;t responsible
           for their failures or changes.
         </p>
       </section>

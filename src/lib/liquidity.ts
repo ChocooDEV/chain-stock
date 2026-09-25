@@ -1,7 +1,11 @@
 import { fetchStockCatalog } from "@/lib/stocks";
 
 const JUPITER_QUOTE_URL = "https://lite-api.jup.ag/swap/v1/quote";
-const USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+/** Circle's real USDC mint on Solana mainnet — the single source of truth
+ *  for this address in the codebase (also used by
+ *  `scripts/mainnet-init-config.ts`'s `initialize_config` call). */
+export const MAINNET_USDC_MINT = "EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v";
+const USDC_MINT = MAINNET_USDC_MINT;
 const USDC_DECIMALS = 6;
 // Matches the gift form's default amount — the smallest realistic gift
 // size, and therefore the easiest one to route. If a ticker can't clear

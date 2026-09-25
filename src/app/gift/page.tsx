@@ -7,7 +7,7 @@ import { GiftPageClient } from "./GiftPageClient";
 // longer title gets truncated there ("Send a gift — StockP...").
 export const metadata: Metadata = {
   title: "ChainStock",
-  description: "Pick a stock, pick an amount, send a link — onboard your friends.",
+  description: "Pick a stock, pick an amount, send a link - onboard your friends.",
 };
 
 export default function GiftPage() {

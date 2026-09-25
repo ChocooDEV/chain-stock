@@ -29,7 +29,7 @@ export function Hero() {
             </h1>
 
             <p className="mt-6 max-w-md text-lg text-ink/70 lg:text-xl">
-              Pick a stock, pick an amount, send a link — onboard your friends.
+              Pick a stock, pick an amount, send a link - onboard your friends.
             </p>
 
             {/* Centering wrapper is kept separate from the positioning

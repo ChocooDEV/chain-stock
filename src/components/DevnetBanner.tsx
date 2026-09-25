@@ -11,7 +11,7 @@ export function DevnetBanner() {
 
   return (
     <div className="sticky top-0 z-50 bg-gold px-4 py-2 text-center text-sm font-semibold text-ink">
-      DEVNET MODE — test gifts only, no real money or stock involved.
+      DEVNET MODE - test gifts only, no real money or stock involved.
     </div>
   );
 }

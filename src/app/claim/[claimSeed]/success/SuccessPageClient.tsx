@@ -56,7 +56,7 @@ export function SuccessPageClient({ gift }: { gift: ClaimGift }) {
             You&rsquo;ve got stock!
           </h1>
           <p className="mt-3 text-lg text-ink/60">
-            Congrats — you just claimed a gift.
+            Congrats - you just claimed a gift.
           </p>
 
           <div className="mt-10 rounded-3xl border border-ink/10 bg-white p-6 text-left shadow-sm sm:p-8">
