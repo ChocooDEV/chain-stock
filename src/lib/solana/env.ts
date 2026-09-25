@@ -1,8 +1,9 @@
 /**
- * Cluster config, read from env so the same code runs against devnet
- * (current — see docs/Wallets.md and docs/SecurityAudit.md for the
- * devnet program/Config PDA this points at) and mainnet later just by
- * changing env vars, not code. `NEXT_PUBLIC_*` variants exist because
+ * Cluster config, read from env so the same code runs against devnet and
+ * mainnet just by changing env vars, not code. Defaults to devnet when
+ * `NEXT_PUBLIC_SOLANA_CLUSTER` is unset or unrecognized — deliberately
+ * fail-safe, so a misconfigured environment degrades to the test network
+ * rather than silently transacting real money. `NEXT_PUBLIC_*` variants exist because
  * Next.js only inlines `NEXT_PUBLIC_`-prefixed vars into client bundles —
  * `SOLANA_RPC_URL` (server-only, see connection.ts) and
  * `NEXT_PUBLIC_SOLANA_RPC_URL` should point at the same cluster.

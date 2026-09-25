@@ -4,8 +4,9 @@ A walkthrough of every screen, as they exist today. **UI/UX is real; the
 money isn't yet** — every screen below is fully built and wired for
 interaction, but `create_gift`/`claim_gift`/`cancel_gift` aren't
 connected to the real Solana program yet (see `../../TODO.md` for exactly
-what's left). Stock prices and logos are real, live data (Sunrise +
-Jupiter). The claim and history pages read the **real database** now
+what's left). Stock prices, catalog, and logos are real, live data (all
+via Jupiter — see Architecture.md's `GET /api/stocks`). The claim and
+history pages read the **real database** now
 (`GET /api/gifts/...`, see Architecture.md) — the screenshots below show
 them populated via `scripts/seed-demo-gifts.mjs`, since no real gifts
 exist yet without the deployed program to actually create one. Only the

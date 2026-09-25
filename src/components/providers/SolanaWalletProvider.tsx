@@ -23,10 +23,9 @@ export function SolanaWalletProvider({
 }: {
   children: React.ReactNode;
 }) {
-  // Cluster-aware (see lib/solana/env.ts) — currently devnet while the
-  // program is only deployed there (docs/Wallets.md). A connected wallet
-  // extension must itself be switched to the matching cluster, or its
-  // own signed transactions will target the wrong network.
+  // Cluster-aware (see lib/solana/env.ts). A connected wallet extension
+  // must itself be switched to the matching cluster, or its own signed
+  // transactions will target the wrong network.
   const endpoint = useMemo(() => getClientRpcUrl(), []);
 
   return (

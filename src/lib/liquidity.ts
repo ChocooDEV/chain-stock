@@ -66,8 +66,9 @@ async function checkTicker(
 }
 
 /**
- * Checks every ticker in the live Sunrise/Backpack Securities catalog
- * for actual Jupiter swap-route liquidity, not just a reference price —
+ * Checks every ticker in the live Backpack Securities catalog (see
+ * `fetchStockCatalog` in `stocks.ts`) for actual Jupiter swap-route
+ * liquidity, not just a reference price —
  * see `token_liquidity`'s schema comment (`src/lib/db/schema.ts`) for
  * why the price-only check `GET /api/stocks` used to rely on isn't
  * enough (a real example: `XYZ`/"Block" has a reference price but zero

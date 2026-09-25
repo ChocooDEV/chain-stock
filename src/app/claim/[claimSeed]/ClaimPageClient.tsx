@@ -26,11 +26,11 @@ import rallyCelebrating from "../../../../public/mascot/rally-celebrating.png";
 
 /**
  * Claim screen (docs/mockup/claim.png). Once authenticated, calls
- * `POST /api/gifts/[claimSeed]/prepare-claim` (builds `claim_gift`
- * server-side — see that route's doc comment for the devnet-mode
- * simplifications, notably no Jupiter swap yet), has the connected Privy
- * wallet sign and send it, then confirms via `confirm-claim` before the
- * unwrap animation plays.
+ * `POST /api/gifts/[claimSeed]/prepare-claim` (builds the atomic
+ * `claim_gift` + Jupiter swap transaction server-side, sponsoring the fee
+ * when the claimer holds no SOL — see that route's doc comment), has the
+ * connected Privy wallet sign and send it, then confirms via
+ * `confirm-claim` before the unwrap animation plays.
  *
  * Deliberately ONE "Claim gift" button, not the mockup's three ("Connect
  * wallet" / "Sign up to claim" / "Claim gift") — docs/App.md decided

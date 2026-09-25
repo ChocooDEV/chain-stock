@@ -1,5 +1,10 @@
 import { NextResponse } from "next/server";
-import { fetchStockCatalog, stockLogoUrl, type LiveStock } from "@/lib/stocks";
+import {
+  fetchStockCatalog,
+  stockLogoUrl,
+  type LiveStock,
+  type StockConfig,
+} from "@/lib/stocks";
 import { getUntradableMints } from "@/lib/db/queries";
 
 const JUPITER_PRICE_URL = "https://lite-api.jup.ag/price/v3";
@@ -24,7 +29,16 @@ async function fetchPrices(
 }
 
 export async function GET() {
-  const catalog = await fetchStockCatalog();
+  let catalog: StockConfig[];
+  try {
+    catalog = await fetchStockCatalog();
+  } catch (error) {
+    // Logged rather than returned: the reason (Jupiter transport failure,
+    // unexpected response shape) belongs in the deploy's logs, not in a
+    // response body.
+    console.error("Stock catalog fetch failed:", error);
+    catalog = [];
+  }
   if (catalog.length === 0) {
     return NextResponse.json(
       { error: "Failed to fetch stock catalog" },

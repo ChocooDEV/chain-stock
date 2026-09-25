@@ -4,37 +4,55 @@ export type StockConfig = {
   mint: string;
 };
 
-const SUNRISE_TOKENS_URL = "https://api.sunrise.xyz/v1/tokens";
+const JUPITER_TAG_URL = "https://lite-api.jup.ag/tokens/v2/tag?query=verified";
 
-type SunriseToken = {
-  address: string;
+/**
+ * Every Backpack Securities stock token observed on mainnet shares this
+ * exact freeze authority — a real on-chain invariant, not just a text
+ * label Jupiter assigned. Cross-checked below rather than trusted
+ * outright: `tags` alone would accept anything Jupiter happened to tag
+ * both `stocks` and `backpack`, which is Jupiter's own third-party
+ * classification, not Backpack's direct attestation. Verified 2026-09-25
+ * against all 61 currently-tagged tokens; if Backpack ever rotates this
+ * key, matched tokens would silently drop out here rather than admit an
+ * impostor — the fail-safe direction for a financial catalog.
+ */
+const BACKPACK_FREEZE_AUTHORITY = "2cVYpagTt7ZGc3mmTXBa7fAznUtx5DUu6aCq8uVDaf4a";
+
+type JupiterVerifiedToken = {
+  id: string;
   symbol: string;
   name: string;
-  assetClass: string;
-  issuer: string | null;
+  tags?: string[];
+  freezeAuthority?: string | null;
 };
 
-function isSunriseToken(value: unknown): value is SunriseToken {
+function isJupiterVerifiedToken(value: unknown): value is JupiterVerifiedToken {
   if (typeof value !== "object" || value === null) return false;
   const token = value as Record<string, unknown>;
   return (
-    typeof token.address === "string" &&
+    typeof token.id === "string" &&
     typeof token.symbol === "string" &&
-    typeof token.name === "string" &&
-    typeof token.assetClass === "string" &&
-    (token.issuer === null || typeof token.issuer === "string")
+    typeof token.name === "string"
   );
 }
 
 /**
  * The full current catalog of real, on-chain Backpack Securities stock
- * tokens (issued through Backpack's broker-dealer subsidiary, listed via
- * Sunrise, redeemable 1:1 for the underlying share) — not Backed
+ * tokens (issued through Backpack's broker-dealer subsidiary, distributed
+ * via Sunrise, redeemable 1:1 for the underlying share) — not Backed
  * Finance's unrelated "xStocks" product. Fetched live rather than
  * hardcoded: Backpack adds new listings over time (50+ at the time of
- * writing, well past the ~20 expected), and Sunrise's own API is the
- * authoritative source for which mints are real vs. an unrelated token
- * squatting on the same ticker text.
+ * writing, well past the ~20 expected).
+ *
+ * Sourced from Jupiter's token API (the same host already used for
+ * prices and swap quotes, so no new dependency) rather than Sunrise's own
+ * listings API: `tags.includes("stocks")` alone matches 1,600+ tokens
+ * across every tokenized-stock issuer on Solana (e.g. `AAPLx` vs.
+ * `AAPLon` are different, unrelated issuers), so `backpack` narrows it,
+ * and `BACKPACK_FREEZE_AUTHORITY` above is the authenticity check that
+ * keeps an unrelated token from qualifying just by being tagged the same
+ * way Jupiter tagged real Backpack tokens.
  *
  * Shared by `GET /api/stocks` and `src/lib/liquidity.ts`'s cron check —
  * both need the same catalog, and the second one existing (see
@@ -42,33 +60,27 @@ function isSunriseToken(value: unknown): value is SunriseToken {
  * to live only inline in the stocks route: a second consumer showed up.
  */
 export async function fetchStockCatalog(): Promise<StockConfig[]> {
-  const tokens: SunriseToken[] = [];
-  let cursor: string | undefined;
+  const res = await fetch(JUPITER_TAG_URL, { next: { revalidate: 300 } });
+  if (!res.ok) {
+    throw new Error(`Jupiter verified-token list request failed (${res.status})`);
+  }
+  const body = await res.json();
+  if (!Array.isArray(body)) {
+    throw new Error("Jupiter verified-token list returned an unexpected shape");
+  }
 
-  do {
-    const url = cursor
-      ? `${SUNRISE_TOKENS_URL}?cursor=${encodeURIComponent(cursor)}`
-      : SUNRISE_TOKENS_URL;
-    const res = await fetch(url, { next: { revalidate: 300 } });
-    if (!res.ok) break;
-    const body = await res.json();
-    const rawTokens = body?.data?.tokens;
-    if (Array.isArray(rawTokens)) tokens.push(...rawTokens.filter(isSunriseToken));
-    cursor =
-      typeof body?.data?.pagination?.nextCursor === "string"
-        ? body.data.pagination.nextCursor
-        : undefined;
-  } while (cursor);
-
-  return tokens
+  return body
+    .filter(isJupiterVerifiedToken)
     .filter(
       (token) =>
-        token.assetClass === "stock" && token.issuer === "backpack_securities",
+        !!token.tags?.includes("stocks") &&
+        !!token.tags?.includes("backpack") &&
+        token.freezeAuthority === BACKPACK_FREEZE_AUTHORITY,
     )
     .map((token) => ({
       symbol: token.symbol,
       name: token.name.replace(/\s*-\s*Backpack Securities$/, ""),
-      mint: token.address,
+      mint: token.id,
     }));
 }
 
