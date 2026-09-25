@@ -5,11 +5,13 @@ import { Hero } from "@/components/landing/Hero";
 
 export default function LandingPage() {
   return (
-    <>
+    <div className="flex min-h-screen flex-col">
       <Header />
-      <Hero />
-      <FeatureGrid />
+      <main className="flex-1">
+        <Hero />
+        <FeatureGrid />
+      </main>
       <Footer />
-    </>
+    </div>
   );
 }

@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { SiX } from "react-icons/si";
 import { Container } from "@/components/ui/Container";
 
 /**
@@ -20,10 +19,9 @@ export function Footer() {
             href="https://x.com/chocoo_web3"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-1.5 hover:text-ink"
+            className="hover:text-ink"
           >
             Made by Chocoo
-            <SiX className="h-3.5 w-3.5" aria-hidden />
           </a>
         </div>
       </Container>
