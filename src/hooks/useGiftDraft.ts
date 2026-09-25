@@ -71,5 +71,11 @@ export function useGiftDraft() {
     setDraft(DEFAULT_DRAFT);
   };
 
-  return [draft, setDraft, resetDraft] as const;
+  // Exposed so callers that apply their own default-if-empty logic (e.g.
+  // GiftForm defaulting `symbol` to the first live stock) can wait for
+  // this localStorage read to land first — otherwise that logic runs on
+  // the pre-hydration `DEFAULT_DRAFT` values on every fresh mount (a
+  // mobile wallet's approve-then-return deep link reload, notably) and
+  // unconditionally overwrites whatever was about to be restored.
+  return [draft, setDraft, resetDraft, hydrated] as const;
 }

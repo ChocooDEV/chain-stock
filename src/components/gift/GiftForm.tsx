@@ -68,7 +68,7 @@ export function GiftForm({
   loading: boolean;
 }) {
   const router = useRouter();
-  const [draft, setDraft, resetDraft] = useGiftDraft();
+  const [draft, setDraft, , draftHydrated] = useGiftDraft();
   const { connected, publicKey, sendTransaction } = useWallet();
   const anchorWallet = useAnchorWallet();
   const { connection } = useConnection();
@@ -78,12 +78,18 @@ export function GiftForm({
   const [sending, setSending] = useState(false);
 
   // Default to the first live stock once the catalog loads, if the sender
-  // hasn't already picked (or restored) one.
+  // hasn't already picked (or restored) one. Gated on `draftHydrated` —
+  // GiftPageClient only ever mounts this component once `stocks` is
+  // already loaded, so on a fresh mount (e.g. a mobile wallet's
+  // approve-then-return deep link reloading the page) this effect would
+  // otherwise run against the pre-hydration `draft.symbol === null` and
+  // unconditionally stomp a symbol useGiftDraft was about to restore from
+  // localStorage in that same effect-flush.
   useEffect(() => {
-    if (!draft.symbol && stocks.length > 0) {
+    if (draftHydrated && !draft.symbol && stocks.length > 0) {
       setDraft((current) => ({ ...current, symbol: stocks[0].symbol }));
     }
-  }, [stocks, draft.symbol, setDraft]);
+  }, [draftHydrated, stocks, draft.symbol, setDraft]);
 
   const selectedStock = stocks.find((stock) => stock.symbol === draft.symbol) ?? null;
 
@@ -202,7 +208,12 @@ export function GiftForm({
         throw new Error(body?.error ?? "Failed to index the gift");
       }
 
-      resetDraft();
+      // Deliberately NOT resetDraft() here — GiftSentClient's own
+      // useGiftDraft() instance needs to read this same draft out of
+      // localStorage first (to snapshot it for display) before clearing
+      // it. Clearing it here wipes localStorage before that page ever
+      // mounts, so it would always render DEFAULT_DRAFT instead of what
+      // was actually just sent.
       router.push(`/gift/sent?id=${claimSeed}`);
     } catch (error) {
       showToast(
