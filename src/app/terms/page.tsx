@@ -79,9 +79,10 @@ export default function TermsPage() {
       <section>
         <h2>6. Fees</h2>
         <p>
-          ChainStock charges a platform fee on every gift sent, set on-chain
-          and visible before you send. Network (transaction) fees are
-          separate, paid to the Solana network itself, and outside
+          ChainStock charges a platform fee on every gift sent: 2.5% of the
+          gift amount, or $0.15, whichever is higher. This rate is set
+          on-chain and visible before you send. Network (transaction) fees
+          are separate, paid to the Solana network itself, and outside
           ChainStock&rsquo;s control.
         </p>
       </section>
