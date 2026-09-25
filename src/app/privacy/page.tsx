@@ -4,6 +4,7 @@ import { PRIVACY_LAST_UPDATED } from "@/lib/legal/constants";
 
 export const metadata: Metadata = {
   title: "Privacy Policy - ChainStock",
+  description: "What ChainStock collects, why, and how it's handled.",
 };
 
 /**

@@ -8,8 +8,9 @@ import { getSiteUrl } from "@/lib/site";
  * directly to build a link preview and don't respect `robots.txt`; this
  * file only controls what Google/Bing/etc. crawl and index.
  *
- * Only `/` and `/gift` are allowed — a claim link is meant to be shared
- * with one specific recipient via its own link, not discovered through
+ * `/`, `/gift`, `/pitch`, `/terms`, and `/privacy` are the stable, public
+ * pages — matches `sitemap.ts`. A claim link is meant to be shared with
+ * one specific recipient via its own link, not discovered through
  * search, and `/history`/`/gift/sent` both show a connected wallet's own
  * data. `/api/` is never content worth indexing.
  */
@@ -17,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: "*",
-      allow: ["/", "/gift"],
+      allow: ["/", "/gift", "/pitch", "/terms", "/privacy"],
       disallow: ["/gift/sent", "/claim/", "/history", "/api/"],
     },
     sitemap: `${getSiteUrl()}/sitemap.xml`,

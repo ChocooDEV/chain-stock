@@ -4,6 +4,7 @@ import { TERMS_LAST_UPDATED } from "@/lib/legal/constants";
 
 export const metadata: Metadata = {
   title: "Terms of Service - ChainStock",
+  description: "The terms that apply to sending and claiming gifts on ChainStock.",
 };
 
 /**

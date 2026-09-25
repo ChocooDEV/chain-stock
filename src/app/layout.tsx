@@ -4,10 +4,9 @@ import { SolanaWalletProvider } from "@/components/providers/SolanaWalletProvide
 import { PrivyClientProvider } from "@/components/providers/PrivyClientProvider";
 import { LegalGateProvider } from "@/components/legal/LegalGateProvider";
 import { DevnetBanner } from "@/components/DevnetBanner";
+import { StructuredData, SITE_DESCRIPTION } from "@/components/StructuredData";
 import { getSiteUrl } from "@/lib/site";
 import "./globals.css";
-
-const DESCRIPTION = "Send a friend real stock, as easily as sending a link.";
 
 /**
  * `metadataBase` resolves every relative OG/Twitter image URL this app
@@ -19,17 +18,17 @@ const DESCRIPTION = "Send a friend real stock, as easily as sending a link.";
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: "ChainStock",
-  description: DESCRIPTION,
+  description: SITE_DESCRIPTION,
   openGraph: {
     title: "ChainStock",
-    description: DESCRIPTION,
+    description: SITE_DESCRIPTION,
     siteName: "ChainStock",
     type: "website",
   },
   twitter: {
     card: "summary_large_image",
     title: "ChainStock",
-    description: DESCRIPTION,
+    description: SITE_DESCRIPTION,
   },
 };
 
@@ -44,6 +43,7 @@ export default function RootLayout({
       className={`${fontDisplay.variable} ${fontBody.variable} ${fontTicker.variable}`}
     >
       <body>
+        <StructuredData />
         <DevnetBanner />
         <PrivyClientProvider appId={process.env.PRIVY_APP_ID}>
           <SolanaWalletProvider>
